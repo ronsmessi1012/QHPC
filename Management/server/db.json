@@ -1,0 +1,93 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "username": "admin",
+      "passwordHash": "$2b$10$FgvQrtrw3XUoIbtVFzptpuaqCwUo7lwCQfibqe//dj.5tXLcqWFgS",
+      "role": "admin",
+      "name": "Admin User"
+    },
+    {
+      "id": "u_98x8hx7u2",
+      "username": "smolabir",
+      "passwordHash": "$2b$10$Rdo3iftzgmnUx9XuJpgmde3DxQkC.hkuDXAxeZozlCnbu13./YU3q",
+      "role": "member",
+      "name": "himadri"
+    }
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "name": "Welcome to NotionLocal",
+      "description": "Your starting workspace for project management.",
+      "assignedUserIds": [
+        "u1"
+      ],
+      "pages": [
+        {
+          "id": "pg1",
+          "title": "Quick Start Guide",
+          "blocks": [
+            {
+              "id": "b1",
+              "type": "h1",
+              "content": "Welcome to NotionLocal 🚀"
+            },
+            {
+              "id": "b2",
+              "type": "text",
+              "content": "This is a collaborative block-based document editor, similar to Notion. You can click anywhere to edit a block, press Enter to create a new one, or use the slash command to change formats."
+            },
+            {
+              "id": "b3",
+              "type": "h2",
+              "content": "Useful Features"
+            },
+            {
+              "id": "b4",
+              "type": "bullet",
+              "content": "Press / to open the block selector (Heading 1, 2, 3, Bullet, To-Do, Code)."
+            },
+            {
+              "id": "b5",
+              "type": "todo",
+              "content": "Try checking this to-do item!",
+              "checked": false
+            },
+            {
+              "id": "b6",
+              "type": "todo",
+              "content": "Try editing this task list",
+              "checked": true
+            },
+            {
+              "id": "b7",
+              "type": "callout",
+              "content": "💡 Tip: Log in as Admin to create new projects, add your mates, and assign them to separate projects."
+            }
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "t1",
+          "title": "Explore the board",
+          "description": "Try dragging tasks or modifying details in the board tab.",
+          "status": "todo",
+          "priority": "medium",
+          "dueDate": "2026-08-30",
+          "assignedUserId": "u1"
+        },
+        {
+          "id": "t2",
+          "title": "Invite project mates",
+          "description": "Go to the Admin Panel to register users and assign project permissions.",
+          "status": "in-progress",
+          "priority": "high",
+          "dueDate": "2026-08-25",
+          "assignedUserId": "u1"
+        }
+      ]
+    }
+  ]
+}
