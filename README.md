@@ -8,14 +8,26 @@ Welcome to the **QHPC** repository. This workspace is organized into two primary
 
 ```
 QHPC/
-├── Agent/               # Q-HPC Agent Research & Pipeline
-│   ├── docs/            # Architecture blueprints & literature references
-│   ├── backend/         # Python backend: LLM Agents & Decision Logic
-│   └── frontend/        # Web dashboard for agent configuration & execution
+├── Agent/                      # Q-HPC-Agent Research & Pipeline
+│   ├── agents/                 # LLM Agents (problem_analyzer, algorithm_selector, critic)
+│   ├── core/                   # Schemas, types, and configurations
+│   ├── llm/                    # Local/Cloud LLM and vLLM clients
+│   ├── hpc/                    # HPC compilation and execution modules
+│   ├── algorithms/             # Classical and Quantum algorithm solver pools
+│   │   ├── classical/
+│   │   └── quantum/
+│   ├── experiments/            # Benchmark runs and experimental logs
+│   ├── tests/                  # Unit and integration test suites
+│   ├── scripts/                # Execution and helper scripts
+│   ├── docs/                   # Architecture blueprints and references
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── requirements.txt
+│   └── main.py
 │
-└── Management/          # NotionLocal: Collaborative Project Board
-    ├── server/          # Node.js backend & local file-based database
-    └── src/             # React (Vite) frontend with Block Editor & Kanban
+└── Management/                 # NotionLocal: Collaborative Project Board
+    ├── server/                 # Node.js backend & local file-based database
+    └── src/                    # React (Vite) frontend with Block Editor & Kanban
 ```
 
 | Component | Technology Stack | Role in Repository |
