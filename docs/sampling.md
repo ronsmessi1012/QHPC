@@ -329,7 +329,7 @@ Classical Pool  Quantum Pool
 
 All candidate lists are strictly sorted in descending order of prior score:
 
-$$CandidatePool = \text{Sort}(prior\_score, \text{descending})$$
+$$CandidatePool = \operatorname{Sort}(\text{prior-score}, \text{descending})$$
 
 ---
 
@@ -495,7 +495,11 @@ $$B = 1.0 - \Delta S$$
 - Lower $B$ indicates a decisive winner.
 
 ### 3. Winner Determination
-$$\text{Winner} = \begin{cases} \text{classical}, & \text{if } S_C > S_Q \\ \text{quantum}, & \text{if } S_Q > S_C \\ \text{tie}, & \text{if } S_C = S_Q \end{cases}$$
+$$\text{Winner} = \begin{cases} 
+\text{classical}, & \text{if } S_C > S_Q \\ 
+\text{quantum}, & \text{if } S_Q > S_C \\ 
+\text{tie}, & \text{if } S_C = S_Q 
+\end{cases}$$
 
 ---
 

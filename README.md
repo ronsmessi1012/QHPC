@@ -182,33 +182,52 @@ All decision logic in Q-HPC is governed by strict mathematical formulas:
 $$0.0 \le \text{Confidence} \le 1.0, \quad 0.0 \le \text{PriorScore} \le 1.0$$
 
 ### 2. Paradigm Family Affinities
-$$\text{Affinity}_C = \max_{c \in C_{\text{classical}}} (c.\text{prior\_score})$$
-$$\text{Affinity}_Q = \max_{q \in C_{\text{quantum}}} (q.\text{prior\_score})$$
+$$\text{Affinity}_C = \max_{c \in C_{\text{classical}}} (c.\text{prior-score})$$
+
+$$\text{Affinity}_Q = \max_{q \in C_{\text{quantum}}} (q.\text{prior-score})$$
 
 ### 3. Dimension Category Matching & Bonus Multiplier
-$$\text{Category}(D) = \begin{cases} \text{small}, & D \le 50 \\ \text{medium}, & 51 \le D \le 200 \\ \text{large}, & 201 \le D \le 1000 \\ \text{very\_large}, & D > 1000 \end{cases}$$
+$$\text{Category}(D) = \begin{cases} 
+\text{small}, & D \le 50 \\ 
+\text{medium}, & 51 \le D \le 200 \\ 
+\text{large}, & 201 \le D \le 1000 \\ 
+\text{very-large}, & D > 1000 
+\end{cases}$$
 
-$$D_{\text{bonus}}(a) = \begin{cases} 1.00, & \text{if Preferred Category} = \text{Actual Category} \\ 0.75, & \text{if Preferred Category is Adjacent} \\ 0.40, & \text{otherwise} \end{cases}$$
+$$D_{\text{bonus}}(a) = \begin{cases} 
+1.00, & \text{if Preferred Category} = \text{Actual Category} \\ 
+0.75, & \text{if Preferred Category is Adjacent} \\ 
+0.40, & \text{otherwise} 
+\end{cases}$$
 
 ### 4. Multi-Attribute Algorithm Compatibility Formulation
 For any algorithm candidate $a$:
 $$S_{\text{compat}}(a) = 0.45 \cdot P_a + 0.25 \cdot C_a + 0.20 \cdot K_a + 0.10 \cdot D_{\text{bonus}}(a)$$
+
 - $P_a$ = Expert prior suitability score
 - $C_a$ = Constraint handling capability fit
 - $K_a$ = Computational complexity resilience
 - $D_{\text{bonus}}(a)$ = Dimension scale bonus
 
 ### 5. Competitive Score Margin & Borderline Similarity Score
-Let $S_C = \max_{a \in C} S_{\text{compat}}(a)$ and $S_Q = \max_{a \in Q} S_{\text{compat}}(a)$:
+Let $S_C = \max_{a \in C_{\text{classical}}} S_{\text{compat}}(a)$ and $S_Q = \max_{a \in Q_{\text{quantum}}} S_{\text{compat}}(a)$:
+
 $$\Delta S = |S_C - S_Q|$$
+
 $$B = 1.0 - \Delta S$$
 
 ### 6. Deterministic Routing Decision Boundaries
-$$\text{RoutingMode} = \begin{cases} \text{classical\_only}, & \Delta S \ge 0.25 \text{ and } S_C > S_Q \\ \text{quantum\_only}, & \Delta S \ge 0.25 \text{ and } S_Q > S_C \\ \text{dual\_execution}, & 0.15 \le \Delta S < 0.25 \\ \text{borderline\_review}, & \Delta S < 0.15 \quad (\text{Escalate to LLM Agent Selector}) \end{cases}$$
+$$\text{RoutingMode} = \begin{cases} 
+\text{classical-only}, & \Delta S \ge 0.25 \text{ and } S_C > S_Q \\ 
+\text{quantum-only}, & \Delta S \ge 0.25 \text{ and } S_Q > S_C \\ 
+\text{dual-execution}, & 0.15 \le \Delta S < 0.25 \\ 
+\text{borderline-review}, & \Delta S < 0.15 \quad (\text{LLM Agent Selector Review}) 
+\end{cases}$$
 
 ### 7. Deterministic Confidence Calibration
 To guarantee mathematical consistency between uncertainty and decision confidence:
-$$C_{\text{decision}} = \text{clamp}\Big(1.0 - (B \times 0.40),\ 0.55,\ 0.95\Big)$$
+
+$$C_{\text{decision}} = \operatorname{clamp}\Big(1.0 - (B \times 0.40),\ 0.55,\ 0.95\Big)$$
 
 | Borderline Score ($B$) | Uncertainty Level | Calibrated Confidence ($C_{\text{decision}}$) |
 |:---:|:---:|:---:|
