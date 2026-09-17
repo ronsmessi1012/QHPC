@@ -24,7 +24,7 @@ Current Progress:
 - [x] Step 1 — Problem Specification Schema
 - [x] Step 2 — Deterministic Problem Analyzer
 - [x] Step 3 — LLM-Powered Problem Analyzer (Qwen2.5 via Ollama)
-- [ ] Step 4 — Dual Candidate Generator
+- [x] Step 4 — Dual Candidate Generator
 - [ ] Remaining workflow.
 
 ---
