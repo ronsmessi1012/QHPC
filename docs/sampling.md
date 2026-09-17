@@ -32,6 +32,7 @@
 - [Constants & Thresholds Registry](#constants--thresholds-registry)
 - [Important Schemas Reference](#important-schemas-reference)
 - [Information Flow Across Modules](#information-flow-across-modules)
+- [Visualizations Suite (Steps V1 → V4)](#visualizations-suite-steps-v1--v4)
 - [Backend Folder Structure](#backend-folder-structure)
 - [Current Completion Status](#current-completion-status)
 - [Key Design Principles](#key-design-principles)
@@ -748,6 +749,19 @@ Every `ExecutionDecision` embeds a complete `reasoning_trace` dictionary contain
 
 ---
 
+# Visualizations Suite (Steps V1 → V4)
+
+To provide deep analytical transparency and publication-grade presentation, Q-HPC includes a dedicated analytical visualization suite in `backend/visualizations/`:
+
+| Visualization Module | Artifact Files | Purpose & Features |
+|----------------------|----------------|--------------------|
+| **Step V1: Dynamic Boundary & Fluctuation Curve** | `v1_borderline_switching_curve.png`<br>`v1_borderline_switching_curve.html` | Visualizes fine-grained classical vs. quantum compatibility trajectories, NISQ decoherence oscillations, and algorithm switching pivots (e.g. $N=335$ vs $N=350$) in the borderline area ($B \ge 0.85$). |
+| **Step V2: 3D Borderline Score Decision Surface** | `v2_borderline_decision_surface_3d.png`<br>`v2_borderline_decision_surface_3d.html` | Interactive 3D WebGL decision landscape with 2D bottom contour projections across Problem Dimensionality ($D$) and Constraint/Complexity Fit ($S_{con} \times S_{comp}$). |
+| **Step V3: AI Agent Compatibility Heatmap** | `v3_agent_compatibility_heatmap.png`<br>`v3_agent_compatibility_heatmap.pdf`<br>`v3_agent_compatibility_heatmap.html` | Conference publication-grade (IEEE/Nature style) compatibility matrix spanning all 22 algorithms across 12 diverse computational archetypes. |
+| **Step V4: AI Agent Impact Network** | `v4_agent_impact_network.png`<br>`v4_agent_impact_network.html` | Flagship multi-stage directed agentic impact network and interactive Sankey flow diagram representing end-to-end evidence propagation and decision flow. |
+
+---
+
 # Backend Folder Structure
 
 ```text
@@ -763,6 +777,14 @@ backend/
 │
 ├── routers/
 │   └── borderline_router.py            # Step 5.4: Mathematical Borderline Router
+│
+├── visualizations/                     # Visualizations Suite (Steps V1 → V4)
+│   ├── __init__.py
+│   ├── v1_borderline_switching_curve.py # Step V1: Dynamic Boundary & Fluctuation Curve
+│   ├── v2_decision_surface_3d.py       # Step V2: 3D Decision Surface & Contours
+│   ├── v3_compatibility_heatmap.py     # Step V3: Conference Publication Heatmap
+│   ├── v4_agent_impact_network.py      # Step V4: Flagship AI Agent Impact Network
+│   └── run_all_visualizations.py       # Master Pipeline Generator
 │
 ├── models/
 │   ├── problem_schema.py               # ProblemSpecification model
@@ -800,7 +822,8 @@ backend/
 │   ├── test_decision_schema.py
 │   └── test_agent_selector.py
 │
-├── outputs/                            # Telemetry, outputs, and generated JSON traces
+├── outputs/
+│   └── visualizations/                 # Generated PNG, PDF, and interactive HTML visual artifacts
 └── main.py                             # Framework entry point
 ```
 
