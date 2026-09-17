@@ -39,8 +39,8 @@ Schema:
 {
   "user_query": "...",
   "problem_class": "classification | regression | optimization | simulation | search | unknown",
-  "dimensionality": integer,
-  "dataset_size": integer,
+  "dimensionality": integer (must be >= 1, e.g., variables, features, or qubits),
+  "dataset_size": integer (must be >= 1, e.g., records, samples, cities, nodes, or qubits; never null),
   "linearity": "linear | nonlinear | unknown",
   "sparsity": "dense | sparse | unknown",
   "constraint_structure": "constrained | unconstrained | mixed | unknown",
@@ -104,8 +104,20 @@ BAD reasoning examples:
             data["reasoning"] = reasoning.strip(" ,.-")
 
             # Normalize confidence value
-            if "confidence" in data:
+            if "confidence" in data and data["confidence"] is not None:
                 data["confidence"] = float(data["confidence"])
+
+            # Defensive fallback and integer casting for dimensionality and dataset_size
+            dim = data.get("dimensionality")
+            dset = data.get("dataset_size")
+
+            if dim is None or dim < 1:
+                dim = dset if (dset is not None and dset >= 1) else 1
+            if dset is None or dset < 1:
+                dset = dim if (dim is not None and dim >= 1) else 1
+
+            data["dimensionality"] = int(dim)
+            data["dataset_size"] = int(dset)
 
             required_fields = set(ProblemSpecification.model_fields.keys())
             received_fields = set(data.keys())
@@ -124,6 +136,13 @@ BAD reasoning examples:
             }
 
             return ProblemSpecification(**filtered_data)
+            
+            # Normalize simulation metadata
+            if (
+                data["problem_class"] == "simulation"
+                and "qubit" in query.lower()
+            ):
+                data["dataset_size"] = data["dimensionality"]
 
         except json.JSONDecodeError as e:
             raise RuntimeError(

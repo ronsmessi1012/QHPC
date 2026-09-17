@@ -954,36 +954,580 @@ Each module returns a Pydantic schema instead of raw dictionaries.
 
 ---
 
-# Next Step (Step 4)
+# Step 4 — Dual Candidate Generation
 
-## Dual Candidate Generator
+> **Module Status:** ✅ Completed & Validated
+>
+> **Workflow Stage:** Step 2 of the Q-HPC Architecture
 
-Input:
+The **Dual Candidate Generation** module is responsible for constructing **parallel Classical and Quantum algorithm pools** for every computational problem identified by the **Problem Analyzer**. This stage **does not select** an execution strategy; instead, it generates all feasible candidate algorithms that will later be evaluated by the **Resource Estimator**, **Borderline Router**, and **Agent Selector**.
 
+---
+
+## Workflow Position
+
+```text
+User Query
+      │
+      ▼
+Problem Analyzer (Step 3)
+      │
 ProblemSpecification
-
-Output:
-
+      │
+      ▼
+Candidate Generator (Step 4)
+      │
+ ┌──────────────┬───────────────┐
+ │ Classical     │ Quantum        │
+ │ Candidate Pool│ Candidate Pool │
+ └──────────────┴───────────────┘
+      │
+      ▼
 CandidatePool
+      │
+      ▼
+Resource Estimator (Step 5)
+```
 
-Contains:
+---
+
+# Step 4.1 — Candidate Schema
+
+## Objective
+
+Create strongly typed Pydantic schemas representing every algorithm candidate.
+
+### Files Added
+
+```text
+backend/models/candidate_schema.py
+backend/tests/test_candidate_schema.py
+```
+
+---
+
+## Schema Design
+
+### `AlgorithmCandidate`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `str` | Human-readable algorithm name. |
+| `family` | `Literal["classical","quantum"]` | Candidate family. |
+| `algorithm_type` | `Literal[...]` | Supported problem category. |
+| `prior_score` | `float` | Initial heuristic suitability score. |
+| `complexity` | `str` | Classical asymptotic complexity or quantum circuit scaling. |
+| `justification` | `str` | One-line explanation for candidate inclusion. |
+
+### `CandidatePool`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `classical_candidates` | `List[AlgorithmCandidate]` | Classical candidate list. |
+| `quantum_candidates` | `List[AlgorithmCandidate]` | Quantum candidate list. |
+
+---
+
+## Why Separate Schemas?
+
+- Strong Pydantic validation.
+- Common interface for downstream agents.
+- Easy JSON serialization.
+- Eliminates malformed candidate objects.
+
+---
+
+## Validation Test
+
+**Command**
+
+```bash
+python3.10 -m backend.tests.test_candidate_schema
+```
+
+**Result**
+
+- One classical candidate created successfully.
+- One quantum candidate created successfully.
+- CandidatePool serialized into JSON.
+
+**Status:** ✅ Passed
+
+---
+
+# Step 4.2 — Classical Algorithm Knowledge Base
+
+## Objective
+
+Build a deterministic registry of supported classical algorithms grouped by problem type.
+
+### Files Added
+
+```text
+backend/utils/constants.py
+backend/utils/classical_library.py
+backend/tests/test_classical_library.py
+```
+
+---
+
+## Classical Algorithm Registry
+
+| Problem Class | Registered Algorithms |
+|---------------|-----------------------|
+| Classification | XGBoost, Random Forest, SVM, Logistic Regression |
+| Regression | Linear Regression, Random Forest Regressor, XGBoost Regressor |
+| Optimization | Branch and Bound, Genetic Algorithm, Simulated Annealing |
+| Simulation | Monte Carlo Simulation, Finite Difference Solver |
+| Search | A* Search, Dijkstra |
+
+---
+
+## Classical Prior Scores
+
+| Algorithm | Prior Score | Reason |
+|-----------|------------|--------|
+| XGBoost | **0.95** | Strong tabular ML baseline. |
+| Random Forest | **0.90** | Robust ensemble learning. |
+| SVM | **0.86** | Effective for high-dimensional classification. |
+| Logistic Regression | **0.80** | Simple interpretable baseline. |
+| Branch and Bound | **0.90** | Exact combinatorial optimization solver. |
+| Genetic Algorithm | **0.87** | Population-based optimization heuristic. |
+| Simulated Annealing | **0.84** | Handles nonlinear constrained optimization. |
+| Monte Carlo Simulation | **0.91** | Standard probabilistic simulation technique. |
+| A* Search | **0.92** | Efficient informed graph search. |
+
+---
+
+## Candidate Ordering
+
+Candidates are sorted in descending order using:
+
+```python
+candidates.sort(
+    key=lambda candidate: candidate.prior_score,
+    reverse=True
+)
+```
+
+This guarantees that the strongest heuristic candidate appears first.
+
+---
+
+## Validation Test
+
+**Command**
+
+```bash
+python3.10 -m backend.tests.test_classical_library
+```
+
+**Result**
+
+- All five problem classes returned valid candidate lists.
+- Candidate ordering followed descending `prior_score`.
+
+**Status:** ✅ Passed
+
+---
+
+# Step 4.3 — Quantum Algorithm Knowledge Base
+
+## Objective
+
+Create the deterministic registry of supported quantum algorithms.
+
+### Files Added
+
+```text
+backend/utils/quantum_library.py
+backend/tests/test_quantum_library.py
+```
+
+---
+
+## Quantum Algorithm Registry
+
+| Problem Class | Registered Algorithms |
+|---------------|-----------------------|
+| Classification | QSVM, Quantum Kernel Classifier |
+| Regression | Variational Quantum Regressor (VQR) |
+| Optimization | QAOA, VQE |
+| Simulation | Quantum Statevector Simulation, Hamiltonian Simulation |
+| Search | Grover Search |
+
+---
+
+## Quantum Prior Scores
+
+| Algorithm | Prior Score | Reason |
+|-----------|------------|--------|
+| QAOA | **0.94** | Designed for constrained combinatorial optimization. |
+| QSVM | **0.89** | Quantum kernel classification algorithm. |
+| Hamiltonian Simulation | **0.90** | Quantum molecular simulation. |
+| Quantum Statevector Simulation | **0.95** | Exact quantum state evolution simulation. |
+| Grover Search | **0.94** | Quadratic speedup for unstructured search. |
+| VQE | **0.83** | Variational optimization through parameterized circuits. |
+| VQR | **0.84** | Regression using variational quantum circuits. |
+
+---
+
+## Validation Test
+
+**Command**
+
+```bash
+python3.10 -m backend.tests.test_quantum_library
+```
+
+**Result**
+
+- All supported quantum algorithms loaded successfully.
+- Candidate objects created correctly.
+- Candidate ordering sorted by `prior_score`.
+
+**Status:** ✅ Passed
+
+---
+
+# Step 4.4 — Candidate Generator Agent
+
+## Objective
+
+Generate parallel classical and quantum candidate pools from the output of the Problem Analyzer.
+
+### Files Added
+
+```text
+backend/agents/candidate_generator.py
+backend/tests/test_candidate_generator.py
+```
+
+---
+
+## Candidate Generator Logic
+
+```python
+classical_candidates = get_classical_candidates(problem.problem_class)
+quantum_candidates = get_quantum_candidates(problem.problem_class)
+
+return CandidatePool(
+    classical_candidates=classical_candidates,
+    quantum_candidates=quantum_candidates
+)
+```
+
+---
+
+## Input
+
+| Object | Produced By |
+|--------|-------------|
+| `ProblemSpecification` | Problem Analyzer |
+
+## Output
+
+| Object | Consumed By |
+|--------|-------------|
+| `CandidatePool` | Resource Estimator |
+
+---
+
+## Example CandidatePool (Optimization)
 
 ### Classical Candidates
 
-- XGBoost
-- Random Forest
-- SVM
-- Logistic Regression
-- Linear Regression
-- Gradient Boosting
+| Algorithm | Prior Score |
+|-----------|------------|
+| Branch and Bound | **0.90** |
+| Genetic Algorithm | **0.87** |
+| Simulated Annealing | **0.84** |
 
 ### Quantum Candidates
 
-- QAOA
-- VQE
-- QSVM
-- Quantum Kernel Methods
-- Grover Search
-- QNN
+| Algorithm | Prior Score |
+|-----------|------------|
+| QAOA | **0.94** |
+| VQE | **0.83** |
 
-The Candidate Generator will not select one algorithm. It will generate both candidate pools, assign suitability metadata, and forward them to the Resource Estimator and Borderline Router.
+---
+
+## Integration Test Results
+
+### Classification Problem
+
+| Classical | Quantum |
+|-----------|---------|
+| XGBoost | QSVM |
+| Random Forest | Quantum Kernel Classifier |
+| SVM | — |
+| Logistic Regression | — |
+
+### Optimization Problem
+
+| Classical | Quantum |
+|-----------|---------|
+| Branch and Bound | QAOA |
+| Genetic Algorithm | VQE |
+| Simulated Annealing | — |
+
+### Simulation Problem
+
+| Classical | Quantum |
+|-----------|---------|
+| Monte Carlo Simulation | Quantum Statevector Simulation |
+| Finite Difference Solver | Hamiltonian Simulation |
+
+### Search Problem
+
+| Classical | Quantum |
+|-----------|---------|
+| A* Search | Grover Search |
+| Dijkstra | — |
+
+**Status:** ✅ Passed
+
+---
+
+# Errors Encountered During Step 4
+
+## Error 1 — Ambiguous Score Name
+
+### Initial Design
+
+```python
+suitability_score = 0.95
+```
+
+### Problem
+
+Later stages introduce multiple scoring mechanisms.
+
+### Fix
+
+Renamed to:
+
+```python
+prior_score
+```
+
+### Reason
+
+| Score | Generated By |
+|-------|--------------|
+| `confidence` | Problem Analyzer |
+| `prior_score` | Candidate Generator |
+| `resource_score` | Resource Estimator |
+| `final_score` | Borderline Router |
+
+This prevents ambiguity throughout the pipeline.
+
+---
+
+## Error 2 — Quantum Candidates Were Missing
+
+### Initial Output
+
+Classification and Search returned:
+
+```text
+Quantum Candidates
+None
+```
+
+### Root Cause
+
+The generator filtered candidates using:
+
+```python
+if problem.quantum_candidate:
+    quantum_candidates = ...
+else:
+    quantum_candidates = []
+```
+
+### Why Incorrect?
+
+Dual Candidate Generation must always construct both candidate pools.
+
+Selection happens later.
+
+### Fix
+
+Removed the conditional filter.
+
+```python
+quantum_candidates = get_quantum_candidates(problem.problem_class)
+```
+
+### Result
+
+| Problem | Quantum Candidates Generated |
+|---------|------------------------------|
+| Classification | QSVM, Quantum Kernel Classifier |
+| Search | Grover Search |
+| Optimization | QAOA, VQE |
+| Simulation | Statevector Simulation, Hamiltonian Simulation |
+
+---
+
+## Error 3 — Candidate Ordering
+
+### Issue
+
+Algorithms appeared in insertion order instead of importance order.
+
+### Fix
+
+Sort by descending `prior_score`.
+
+### Result
+
+Highest-priority candidates appear first in every candidate pool.
+
+---
+
+## Error 4 — Simulation Metadata Inconsistency
+
+### Initial Output
+
+```json
+{
+  "dimensionality": 32,
+  "dataset_size": 1
+}
+```
+
+### Root Cause
+
+The LLM interpreted "32 qubits" as a single simulation instance.
+
+### Fix (Problem Analyzer)
+
+Normalize qubit-based simulations:
+
+```python
+if problem_class == "simulation" and "qubit" in query.lower():
+    dataset_size = dimensionality
+```
+
+### Expected Output
+
+```json
+{
+  "dimensionality": 32,
+  "dataset_size": 32
+}
+```
+
+This normalization is required for quantum resource estimation.
+
+---
+
+# Constants Introduced in Step 4
+
+| Constant | Value / Purpose |
+|----------|------------------|
+| `CLASSICAL_ALGORITHMS` | Registry of classical algorithms grouped by problem class. |
+| `QUANTUM_ALGORITHMS` | Registry of quantum algorithms grouped by problem class. |
+| `prior_score` | Initial heuristic suitability estimate. |
+| `family` | Classical or Quantum algorithm identifier. |
+| `algorithm_type` | Problem category identifier. |
+
+---
+
+# Mathematical Definitions Introduced
+
+## Prior Score Range
+
+$$
+0 \leq prior\_score \leq 1
+$$
+
+Represents an expert prior before hardware-aware estimation.
+
+---
+
+## Candidate Ordering
+
+$$
+CandidatePool = Sort(prior\_score,\ descending)
+$$
+
+The highest prior score appears first.
+
+---
+
+## Candidate Generation Mapping
+
+$$
+ProblemSpecification
+\;\xrightarrow{problem\_class}\;
+(C_{classical}, C_{quantum})
+$$
+
+Where:
+
+- $C_{classical}$ = Classical candidate set.
+- $C_{quantum}$ = Quantum candidate set.
+
+---
+
+## CandidatePool Output Contract
+
+$$
+CandidatePool =
+(C_{classical}, C_{quantum})
+$$
+
+Both candidate sets are forwarded unchanged into the Resource Estimator.
+
+---
+
+# Validation Checklist
+
+| Validation | Status |
+|------------|--------|
+| Candidate Schema | ✅ Passed |
+| Classical Knowledge Base | ✅ Passed |
+| Quantum Knowledge Base | ✅ Passed |
+| Candidate Generator Integration | ✅ Passed |
+| Candidate Ordering | ✅ Passed |
+| Classical + Quantum Pools Generated | ✅ Passed |
+
+---
+
+# Deliverables Created in Step 4
+
+```text
+backend/
+│
+├── agents/
+│   └── candidate_generator.py          ✅
+│
+├── models/
+│   └── candidate_schema.py             ✅
+│
+├── utils/
+│   ├── constants.py                    ✅
+│   ├── classical_library.py            ✅
+│   └── quantum_library.py              ✅
+│
+└── tests/
+    ├── test_candidate_schema.py        ✅
+    ├── test_classical_library.py       ✅
+    ├── test_quantum_library.py         ✅
+    └── test_candidate_generator.py     ✅
+```
+
+---
+
+## Step 4 Completion Status
+
+- [x] 4.1 Candidate Schema
+- [x] 4.2 Classical Algorithm Knowledge Base
+- [x] 4.3 Quantum Algorithm Knowledge Base
+- [x] 4.4 Candidate Generator Agent
+- [x] Integration Testing Completed
+
+**Output Artifact:** `CandidatePool` — the complete parallel classical and quantum candidate space that becomes the input to **Step 5: Resource Estimator**.
