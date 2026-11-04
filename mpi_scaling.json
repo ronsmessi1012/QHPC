@@ -1,0 +1,185 @@
+{
+  "host": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "host_tag": "Linux x86_64 (16 logical / 8 physical)",
+  "mpi_slots": 16,
+  "logical_cores": 16,
+  "physical_cores": 8,
+  "scaling_type": "strong",
+  "repeats": 3,
+  "results": [
+    {
+      "algorithm": "Monte Carlo Simulation",
+      "sizes": {
+        "dimensionality": 10,
+        "dataset_size": 400000
+      },
+      "runs": [
+        {
+          "ranks": 1,
+          "success": true,
+          "runtime_seconds": 16.837477,
+          "all_runtimes": [
+            16.837477,
+            17.018945,
+            16.427874
+          ],
+          "metric_value": 0.00010558641020708137,
+          "device_detail": "mpi4py, 2 ranks",
+          "metric_behaviour": "stochastic",
+          "metric_target": 0.0,
+          "metric_tolerance": 0.0002463275051604486,
+          "metric_note": "pi error varies with rank count because each rank uses its own seed; total samples are unchanged, so it must stay within 3-sigma sampling noise",
+          "speedup": 1.0,
+          "efficiency": 1.0
+        },
+        {
+          "ranks": 2,
+          "success": true,
+          "runtime_seconds": 15.917337,
+          "all_runtimes": [
+            15.917337,
+            17.838115,
+            15.84776
+          ],
+          "metric_value": 0.00010558641020708137,
+          "device_detail": "mpi4py, 2 ranks",
+          "metric_behaviour": "stochastic",
+          "metric_target": 0.0,
+          "metric_tolerance": 0.0002463275051604486,
+          "metric_note": "pi error varies with rank count because each rank uses its own seed; total samples are unchanged, so it must stay within 3-sigma sampling noise",
+          "speedup": 1.0578,
+          "efficiency": 0.5289
+        },
+        {
+          "ranks": 4,
+          "success": true,
+          "runtime_seconds": 8.440389,
+          "all_runtimes": [
+            8.525457,
+            8.440389,
+            8.050379
+          ],
+          "metric_value": 7.167358979298655e-05,
+          "device_detail": "mpi4py, 4 ranks",
+          "metric_behaviour": "stochastic",
+          "metric_target": 0.0,
+          "metric_tolerance": 0.0002463275051604486,
+          "metric_note": "pi error varies with rank count because each rank uses its own seed; total samples are unchanged, so it must stay within 3-sigma sampling noise",
+          "speedup": 1.9949,
+          "efficiency": 0.4987
+        },
+        {
+          "ranks": 8,
+          "success": true,
+          "runtime_seconds": 4.722161,
+          "all_runtimes": [
+            4.645035,
+            4.722161,
+            4.782924
+          ],
+          "metric_value": 8.988358979289401e-05,
+          "device_detail": "mpi4py, 8 ranks",
+          "metric_behaviour": "stochastic",
+          "metric_target": 0.0,
+          "metric_tolerance": 0.0002463275051604486,
+          "metric_note": "pi error varies with rank count because each rank uses its own seed; total samples are unchanged, so it must stay within 3-sigma sampling noise",
+          "speedup": 3.5656,
+          "efficiency": 0.4457
+        },
+        {
+          "ranks": 16,
+          "success": false,
+          "error": "WorkloadUnavailable: mpiexec exited 1 with 16 ranks: Sorry!  You were supposed to get help about: | prte-rmaps-base:alloc-error | But I couldn't open the help file: | /usr/lib/x86_64-linux-gnu/pmix2/share/pmix/help-prte-rmaps-base.txt: No such file or directory | /usr/lib/x86_64-linux-gnu/prrte3/share/prte/help-prte-rmaps-base.txt: No such file or directory. | Sorry! | \u0000"
+        }
+      ],
+      "correctness_verdict": "OK"
+    },
+    {
+      "algorithm": "Genetic Algorithm",
+      "sizes": {
+        "dimensionality": 200,
+        "dataset_size": 8000
+      },
+      "runs": [
+        {
+          "ranks": 1,
+          "success": true,
+          "runtime_seconds": 16.515316,
+          "all_runtimes": [
+            17.200036,
+            16.405247,
+            16.515316
+          ],
+          "metric_value": 2209.466452862725,
+          "device_detail": "mpi4py island model, 2 ranks",
+          "metric_behaviour": "rank_dependent",
+          "metric_target": 0.0,
+          "metric_tolerance": null,
+          "metric_note": "fitness worsens as ranks increase because the fixed total population is split into smaller islands; this is expected under strong scaling and is itself a finding",
+          "speedup": 1.0,
+          "efficiency": 1.0
+        },
+        {
+          "ranks": 2,
+          "success": true,
+          "runtime_seconds": 16.895429,
+          "all_runtimes": [
+            16.895429,
+            16.283506,
+            17.211996
+          ],
+          "metric_value": 2209.466452862725,
+          "device_detail": "mpi4py island model, 2 ranks",
+          "metric_behaviour": "rank_dependent",
+          "metric_target": 0.0,
+          "metric_tolerance": null,
+          "metric_note": "fitness worsens as ranks increase because the fixed total population is split into smaller islands; this is expected under strong scaling and is itself a finding",
+          "speedup": 0.9775,
+          "efficiency": 0.4888
+        },
+        {
+          "ranks": 4,
+          "success": true,
+          "runtime_seconds": 9.415178,
+          "all_runtimes": [
+            8.896366,
+            9.62487,
+            9.415178
+          ],
+          "metric_value": 2266.2743560760628,
+          "device_detail": "mpi4py island model, 4 ranks",
+          "metric_behaviour": "rank_dependent",
+          "metric_target": 0.0,
+          "metric_tolerance": null,
+          "metric_note": "fitness worsens as ranks increase because the fixed total population is split into smaller islands; this is expected under strong scaling and is itself a finding",
+          "speedup": 1.7541,
+          "efficiency": 0.4385
+        },
+        {
+          "ranks": 8,
+          "success": true,
+          "runtime_seconds": 6.680294,
+          "all_runtimes": [
+            6.717934,
+            6.64178,
+            6.680294
+          ],
+          "metric_value": 2441.445755103716,
+          "device_detail": "mpi4py island model, 8 ranks",
+          "metric_behaviour": "rank_dependent",
+          "metric_target": 0.0,
+          "metric_tolerance": null,
+          "metric_note": "fitness worsens as ranks increase because the fixed total population is split into smaller islands; this is expected under strong scaling and is itself a finding",
+          "speedup": 2.4722,
+          "efficiency": 0.309
+        },
+        {
+          "ranks": 16,
+          "success": false,
+          "error": "WorkloadUnavailable: mpiexec exited 1 with 16 ranks: Sorry!  You were supposed to get help about: | prte-rmaps-base:alloc-error | But I couldn't open the help file: | /usr/lib/x86_64-linux-gnu/pmix2/share/pmix/help-prte-rmaps-base.txt: No such file or directory | /usr/lib/x86_64-linux-gnu/prrte3/share/prte/help-prte-rmaps-base.txt: No such file or directory. | Sorry! | \u0000"
+        }
+      ],
+      "correctness_verdict": "EXPECTED_TREND"
+    }
+  ]
+}
